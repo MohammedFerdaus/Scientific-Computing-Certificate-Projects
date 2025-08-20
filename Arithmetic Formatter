@@ -1,0 +1,60 @@
+def arithmetic_arranger(problems, show_answers=False):
+    # Check the length of the parameter
+    if len(problems) > 5:
+        return 'Error: Too many problems.'
+
+    operators = []
+    numbers = []
+
+    for problem in problems:
+        parts = problem.split()
+        num1, op, num2 = parts[0], parts[1], parts[2]
+
+        # Operator check
+        if op not in ['+', '-']:
+            return "Error: Operator must be '+' or '-'."
+
+        # Digit check
+        if not num1.isdigit() or not num2.isdigit():
+            return "Error: Numbers must only contain digits."
+
+        # Length check
+        if len(num1) > 4 or len(num2) > 4:
+            return "Error: Numbers cannot be more than four digits."
+
+        operators.append(op)
+        numbers.append((num1, num2))
+
+    top_row = ''
+    bottom_row = ''
+    dashes = ''
+    answer_row = ''
+
+    for i, (num1, num2) in enumerate(numbers):
+        op = operators[i]
+        width = max(len(num1), len(num2)) + 2
+
+        # Build rows
+        top_row += num1.rjust(width)
+        bottom_row += op + num2.rjust(width - 1)
+        dashes += '-' * width
+
+        if show_answers:
+            result = str(eval(num1 + op + num2))
+            answer_row += result.rjust(width)
+
+        if i < len(numbers) - 1:
+            top_row += '    '
+            bottom_row += '    '
+            dashes += '    '
+            if show_answers:
+                answer_row += '    '
+
+    if show_answers:
+        return f"{top_row}\n{bottom_row}\n{dashes}\n{answer_row}"
+    else:
+        return f"{top_row}\n{bottom_row}\n{dashes}"
+
+
+# Test the function
+print(arithmetic_arranger(["32 + 698", "3801 - 2", "45 + 43", "123 + 49"], True))
