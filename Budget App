@@ -1,0 +1,104 @@
+class Category:
+    # Represents a budget category with transactions (ledger).
+
+    def __init__(self, name):
+        # Initialize category with a name and empty ledger.
+        self.name = name
+        self.ledger = []
+
+    def __str__(self):
+        # Return a formatted string of category ledger and total balance.
+        title = f"{self.name:*^30}\n"
+        items = ""
+        total = 0
+        for item in self.ledger:
+            items += f"{item['description'][:23]:23}" + f"{item['amount']:>7.2f}" + "\n"
+            total += item['amount']
+        output = title + items + "Total: " + str(total)
+        return output
+
+    def deposit(self, amount, description=""):
+        # Add a deposit transaction to the ledger.
+        self.ledger.append({"amount": amount, "description": description})
+
+    def withdraw(self, amount, description=""):
+        # Subtract funds if available, record negative amount.
+        if self.check_funds(amount):
+            self.ledger.append({"amount": -amount, "description": description})
+            return True
+        return False
+
+    def get_balance(self):
+        # Return current balance by summing all ledger amounts.
+        return sum(item["amount"] for item in self.ledger)
+
+    def transfer(self, amount, category):
+        # Transfer amount to another category if funds available.
+        if self.check_funds(amount):
+            self.withdraw(amount, f"Transfer to {category.name}")
+            category.deposit(amount, f"Transfer from {self.name}")
+            return True
+        return False
+
+    def check_funds(self, amount):
+        # Check if balance is sufficient for the given amount.
+        return self.get_balance() >= amount
+
+    def get_withdraw(self):
+        # Return total amount withdrawn (negative amounts as positive).
+        total = 0
+        for item in self.ledger:
+            if item["amount"] < 0:
+                total += abs(item["amount"])
+        return total
+
+
+def truncate(n):
+    # Truncate number to one decimal place without rounding.
+    return int(n * 10) / 10
+
+
+def getTotals(categories):
+    # Compute each category's withdrawal fraction of total withdrawals.
+    total = 0
+    breakdown = []
+    for category in categories:
+        total += category.get_withdraw()
+        breakdown.append(category.get_withdraw())
+    rounded = list(map(lambda x: truncate(x / total), breakdown))
+    return rounded
+
+
+def create_spend_chart(categories):
+    # Generate a percentage chart of spending by category.
+    res = "Percentage spent by category\n"
+    totals = getTotals(categories)
+    i = 100
+    while i >= 0:
+        cat_spaces = " "
+        for total in totals:
+            if total * 100 >= i:
+                cat_spaces += "o  "
+            else:
+                cat_spaces += "   "
+        res += str(i).rjust(3) + "|" + cat_spaces + "\n"
+        i -= 10
+
+    dashes = "    -" + "---" * len(categories)
+    res += dashes + "\n"
+
+    names = [category.name for category in categories]
+    max_len = max(len(name) for name in names)
+
+    for x in range(max_len):
+        name_str = "     "
+        for name in names:
+            if x < len(name):
+                name_str += name[x] + "  "
+            else:
+                name_str += "   "
+        if x < max_len - 1:
+            name_str += "\n"
+        res += name_str
+
+    return res
