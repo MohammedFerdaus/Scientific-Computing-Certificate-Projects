@@ -1,0 +1,71 @@
+import copy
+import random
+
+class Hat:
+    def __init__(self, **kwargs):
+        # Initialize a hat with balls of different colors
+        # kwargs is a dictionary where keys are colors and values are the count of balls of that color
+        self.contents = []
+        for color, count in kwargs.items():
+            # Add 'count' number of 'color' balls to the contents list
+            for _ in range(count):
+                self.contents.append(color)
+
+    def draw(self, number):
+        # Draw 'number' of balls randomly from the hat without replacement
+        if number >= len(self.contents):
+            # If the requested number is greater than or equal to the number of balls in the hat
+            # Return all remaining balls and empty the hat
+            drawn = self.contents.copy()
+            self.contents.clear()
+            return drawn
+
+        drawn = []
+        for _ in range(number):
+            # Randomly pick an index and pop the ball from the hat
+            index = random.randrange(len(self.contents))
+            drawn.append(self.contents.pop(index))
+        return drawn
+
+
+def experiment(hat, expected_balls, num_balls_drawn, num_experiments):
+    """
+    Simulates an experiment to calculate the probability of drawing at least
+    the specified number of each ball color (from expected_balls) when drawing
+    num_balls_drawn balls from the hat, repeated num_experiments times.
+    
+    Parameters:
+    - hat: an instance of Hat containing the balls
+    - expected_balls: dictionary specifying the minimum number of each color to be drawn
+    - num_balls_drawn: number of balls to draw in each experiment
+    - num_experiments: total number of experiments to run
+    
+    Returns:
+    - Probability (as a float) of drawing at least the expected number of each color
+    """
+    count = 0  # Count of successful experiments
+    for _ in range(num_experiments):
+        # Make a deep copy of the hat for each experiment so the original isn't modified
+        hat_copy = copy.deepcopy(hat)
+        
+        # Draw the specified number of balls from the copied hat
+        drawn_balls = hat_copy.draw(num_balls_drawn)
+
+        # Count the frequency of each color in the drawn balls
+        drawn_count = {}
+        for ball in drawn_balls:
+            drawn_count[ball] = drawn_count.get(ball, 0) + 1
+
+        # Check if the drawn balls satisfy the expected minimum counts
+        success = True
+        for color, amount in expected_balls.items():
+            if drawn_count.get(color, 0) < amount:
+                success = False
+                break
+
+        # If success, increment the count
+        if success:
+            count += 1
+
+    # Return the probability as the ratio of successful experiments
+    return count / num_experiments
