@@ -1,0 +1,67 @@
+# Define a Rectangle class
+class Rectangle:
+    # Constructor method to initialize width and height of the rectangle
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+
+    # String representation of the rectangle for printing
+    def __str__(self):
+        return f"Rectangle(width={self.width}, height={self.height})"
+
+    # Method to set/update the width of the rectangle
+    def set_width(self, width):
+        self.width = width
+
+    # Method to set/update the height of the rectangle
+    def set_height(self, height):
+        self.height = height
+
+    # Method to calculate and return the area of the rectangle
+    def get_area(self):
+        return self.width * self.height
+
+    # Method to calculate and return the perimeter of the rectangle
+    def get_perimeter(self):
+        return 2 * (self.width + self.height)
+
+    # Method to calculate and return the length of the diagonal using Pythagoras theorem
+    def get_diagonal(self):
+        return (self.width ** 2 + self.height ** 2) ** 0.5
+
+    # Method to return a string representation of the rectangle using '*' characters
+    # Returns a message if the rectangle is too big
+    def get_picture(self):
+        if self.width > 50 or self.height > 50:
+            return "Too big for picture."
+        # Create each row of '*'s and join them with newline characters
+        return "\n".join(["*" * self.width for _ in range(self.height)]) + "\n"
+
+    # Method to determine how many times another shape can fit inside this rectangle
+    # Uses integer division to count whole fits
+    def get_amount_inside(self, shape):
+        return (self.width // shape.width) * (self.height // shape.height)
+
+
+# Define a Square class that inherits from Rectangle
+class Square(Rectangle):
+    # Constructor method for square, only needs one side
+    def __init__(self, side):
+        super().__init__(side, side)  # Call Rectangle constructor with equal width and height
+
+    # String representation for printing
+    def __str__(self):
+        return f"Square(side={self.width})"
+
+    # Method to set the side length of the square (updates both width and height)
+    def set_side(self, side):
+        self.width = side
+        self.height = side
+
+    # Override Rectangle's set_width method to maintain square properties
+    def set_width(self, width):
+        self.set_side(width)
+
+    # Override Rectangle's set_height method to maintain square properties
+    def set_height(self, height):
+        self.set_side(height)
